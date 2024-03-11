@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+    config.vm.network "public_network", bridge: "eno1", ip: "192.168.18.58", netmask: "255.255.255.0", gateway: "192.168.18.1"
+  
+    config.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+      vb.customize ["createhd", "--filename", "disk1.vdi", "--size", "20480"]
+      vb.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata"]
+      vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", "0", "--device", "0", "--type", "hdd", "--medium", "disk1.vdi"]
+    end
+  
+    config.vm.provision "shell", inline: <<-SHELL
+      # Crear usuario humancero con contraseña z0phermero.$
+      useradd -m -s /bin/bash humancero
+      echo "humancero:z0phermero.$" | chpasswd
+  
+      # Instalar LVM
+      apt-get update
+      apt-get install -y lvm2
+  
+      # Crear un PV, VG y tres LVs de 5GB cada uno
+      echo -e "n\np\n1\n\n\nt\n8e\nw" | fdisk /dev/sdb
+      pvcreate /dev/sdb1
+      vgcreate vg1 /dev/sdb1
+      lvcreate -L 5G -n vola vg1
+      lvcreate -L 5G -n volb vg1
+      lvcreate -L 5G -n volc vg1
+    SHELL
+  end
+  

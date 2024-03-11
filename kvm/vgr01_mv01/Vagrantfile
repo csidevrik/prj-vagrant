@@ -1,0 +1,17 @@
+Vagrant.configure("2") do |config|
+    config.vm.provider :libvirt do |libvirt|
+      libvirt.driver = "kvm"
+      libvirt.graphics_type = "vnc" # Puedes cambiar esto a "spice" si lo deseas
+      libvirt.graphics_autoport = true # Opcional: si quieres que se asigne automáticamente un puerto para la visualización
+    #   libvirt.display_type = "spice"
+    end
+  
+    config.vm.box = "generic/fedora37"
+    config.vm.hostname = "fedkvm01"
+    config.vm.network "public_network", bridge: "virbr0", ip: "192.168.18.57", netmask: "255.255.255.0", gateway: "192.168.18.1"
+    config.vm.provision "shell", inline: <<-SHELL
+        dnf update
+        dnf install -y git zsh ncdu htop openssl
+        useradd -m -s /bin/bash -p $(echo 'z0phermero.$' | openssl passwd -1 -stdin) humancero && sudo usermod -aG wheel humancero
+    SHELL
+  end

@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/adminos/dev/remote/prj-vagrant/virtualbox/lnx/vgrfed37-64","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
